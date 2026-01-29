@@ -15,6 +15,8 @@ func main() {
 
 	// Register health check route
 	handlers.RegisterHealthRoutes(router)
+	// Register summarize route
+	handlers.RegisterSummarizeRoutes(router)
 
 	// Start the server on port 8080
 	err := router.Run(":8080")

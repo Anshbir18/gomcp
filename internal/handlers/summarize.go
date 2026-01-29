@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gomcp/internal/models"
+	"gomcp/internal/services"
 )
 
 // RegisterSummarizeRoutes registers summarize routes
@@ -32,10 +33,31 @@ func Summarize(c *gin.Context) {
 		return
 	}
 
-	// Temporary response (we’ll replace this later)
-	response := models.SummarizeResponse{
-		Summary: "Summarization will be added later",
-	}
+	// // Temporary response (we’ll replace this later)
+	// response := models.SummarizeResponse{
+	// 	Summary: "Summarization will be added later",
+	// }
 
-	c.JSON(http.StatusOK, response)
+	// c.JSON(http.StatusOK, response)
+
+	// If URL is provided, fetch content
+
+	if req.URL != "" {
+		htmlContent, err := services.FetchHTML(req.URL)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "failed to fetch URL content: " + err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK,gin.H{
+			"message":      "html fetched successfully",
+			"html_length": len(htmlContent),
+		})
+		return
+	}
+	// Text path (temporary)
+	c.JSON(http.StatusOK, models.SummarizeResponse{
+		Summary: "text received, summarization coming soon",
+	})
 }

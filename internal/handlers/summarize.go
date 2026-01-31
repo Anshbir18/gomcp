@@ -8,6 +8,13 @@ import (
 	"gomcp/internal/services"
 )
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // RegisterSummarizeRoutes registers summarize routes
 func RegisterSummarizeRoutes(router *gin.Engine) {
 	router.POST("/summarize", Summarize)
@@ -50,9 +57,19 @@ func Summarize(c *gin.Context) {
 			})
 			return
 		}
+
+		text, err := services.ExtractTextFromHTML(htmlContent)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to extract text",
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK,gin.H{
 			"message":      "html fetched successfully",
-			"html_length": len(htmlContent),
+			"text_length": len(text),
+			"preview":     text[:min(300, len(text))],
 		})
 		return
 	}

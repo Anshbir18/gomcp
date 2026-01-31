@@ -66,11 +66,35 @@ func Summarize(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK,gin.H{
-			"message":      "html fetched successfully",
-			"text_length": len(text),
-			"preview":     text[:min(300, len(text))],
+		chunks := services.PrepareTextForSummarization(text)
+
+		summary, err := services.SummarizeChunks(chunks)
+
+		if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to summarize content",
 		})
+		return
+		}
+
+		c.JSON(http.StatusOK, models.SummarizeResponse{
+		Summary: summary,
+		})
+
+
+		// c.JSON(http.StatusOK,gin.H{
+		// 	"message":      "html fetched successfully",
+		// 	"text_length": len(text),
+		// 	"preview":     text[:min(300, len(text))],
+		// })
+
+		
+		// c.JSON(http.StatusOK, gin.H{
+		// "message":    "text prepared for summarization",
+		// "chunks":     len(chunks),
+		// "chunk_size": services.MaxChunkSize,
+		// "preview":    chunks[0][:min(200, len(chunks[0]))],
+		// })
 		return
 	}
 	// Text path (temporary)
